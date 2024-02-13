@@ -3,10 +3,9 @@ package com.test;
 import com.theokanning.openai.embedding.EmbeddingRequest;
 import com.theokanning.openai.embedding.EmbeddingResult;
 import com.theokanning.openai.service.OpenAiService;
-import java.io.IOException;
 import java.util.List;
 
-public class TextSimilaryCalculator {
+public class TextSimilarityCalculator {
     private static final String OPEN_AI_API_KEY = "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";
     private static final String OPEN_AI_MODEL = "text-embedding-3-small";
     private final OpenAiService openAiService = new OpenAiService(OPEN_AI_API_KEY);
@@ -15,7 +14,7 @@ public class TextSimilaryCalculator {
         return calculateCosineSimilarity(calculateEmbedding(first), calculateEmbedding(second));
     }
 
-    public List<Double> calculateEmbedding(String word) {
+    private List<Double> calculateEmbedding(String word) {
         EmbeddingRequest request = EmbeddingRequest.builder()
                 .input(List.of(word))
                 .model(OPEN_AI_MODEL)

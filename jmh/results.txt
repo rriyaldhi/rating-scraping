@@ -1,0 +1,3 @@
+Benchmark                                        Mode  Cnt     Score     Error  Units
+ReviewScrapperBenchmark.testFetchDataFromURL     avgt    3  1138,853 ± 592,169  ms/op
+TextSimilarityCalculatorBenchmark.testCalculate  avgt    3  1556,731 ± 874,556  ms/op
