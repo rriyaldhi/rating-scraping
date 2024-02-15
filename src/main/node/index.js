@@ -5,6 +5,7 @@ const AUTH = 'brd-customer-hl_8f6cf56b-zone-scraping_browser:yzo0qmw801xa';
 const SBR_WS_ENDPOINT = `wss://${AUTH}@brd.superproxy.io:9222`;
 
 async function main() {
+    console.time("executionTime");
     console.log('Connecting to Scraping Browser...');
     const browser = await puppeteer.connect({
         browserWSEndpoint: SBR_WS_ENDPOINT,
@@ -30,6 +31,7 @@ async function main() {
     } finally {
         await browser.close();
     }
+    console.timeEnd("executionTime");
 }
 
 if (require.main === module) {
