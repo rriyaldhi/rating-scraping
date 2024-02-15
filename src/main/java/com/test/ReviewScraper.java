@@ -2,14 +2,10 @@ package com.test;
 
 import com.aayushatharva.brotli4j.Brotli4jLoader;
 import com.aayushatharva.brotli4j.decoder.BrotliInputStream;
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -60,20 +56,21 @@ public class ReviewScraper {
         ResponseEntity<Resource> response = restTemplate.exchange(finalUrl, HttpMethod.GET, entity, Resource.class);
         try {
             InputStream inputStream = response.getBody().getInputStream();
-            if (response.getHeaders().get("Content-Encoding").get(0).equals("br")) {
+            String contentEncoding = response.getHeaders().get("Content-Encoding").get(0);
+            if (contentEncoding.equals("br")) {
                 BrotliInputStream brInputStream = new BrotliInputStream(inputStream);
                 return Optional.of(new String(brInputStream.readAllBytes(), StandardCharsets.UTF_8));
-            } else {
+            } else if (contentEncoding.equals("gzip")) {
                 GZIPInputStream gzipInputStream = new GZIPInputStream(inputStream);
                 return Optional.of(new String(gzipInputStream.readAllBytes(), StandardCharsets.UTF_8));
             }
-        } catch (IOException e) {
-            return Optional.empty();
+        } catch (Exception ignored) {
         }
+        return Optional.empty();
     }
 
     private String buildURL(String userInput) {
-        if (userInput.contains("viator") || userInput.contains("tiqets")) {
+        if (userInput.contains("viator")) {
             return UriComponentsBuilder.fromHttpUrl("http://webcache.googleusercontent.com/search")
                     .queryParam("q", "cache:" + userInput)
                     .queryParam("strip", "1")
