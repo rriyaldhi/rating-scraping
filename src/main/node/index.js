@@ -1,4 +1,6 @@
 const puppeteer = require('puppeteer-core');
+const cheerio = require('cheerio');
+
 const AUTH = 'brd-customer-hl_8f6cf56b-zone-scraping_browser:yzo0qmw801xa';
 const SBR_WS_ENDPOINT = `wss://${AUTH}@brd.superproxy.io:9222`;
 
@@ -19,9 +21,12 @@ async function main() {
         // CAPTCHA solving: If you know you are likely to encounter a CAPTCHA on your target page, add the following few lines of code to get the status of Scraping Browser's automatic CAPTCHA solver
         // Note 1: If no captcha was found it will return not_detected status after detectTimeout
         // Note 2: Once a CAPTCHA is solved, if there is a form to submit, it will be submitted by default
-        // const client = await page.target().createCDPSession();
-        // const {status} = await client.send('Captcha.solve', {detectTimeout: 30*1000});
-        // console.log(`Captcha solve status: ${status}`)
+        const client = await page.target().createCDPSession();
+        const {status} = await client.send('Captcha.solve', {detectTimeout: 30*1000});
+        console.log(`Captcha solve status: ${status}`)
+        const $ = cheerio.load(html);
+        const text = $('[data-automation="reviewBubbleScore"]').text();
+        console.log(text);
     } finally {
         await browser.close();
     }
