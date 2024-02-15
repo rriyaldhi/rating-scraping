@@ -6,6 +6,13 @@ plugins {
 group = 'com.test'
 version = '1.0-SNAPSHOT'
 
+import org.gradle.nativeplatform.platform.internal.Architectures
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
+def brotliVersion = "1.16.0"
+def operatingSystem = DefaultNativePlatform.getCurrentOperatingSystem()
+def currentArchitecture = DefaultNativePlatform.getCurrentArchitecture()
+
 repositories {
     mavenCentral()
 }
@@ -14,6 +21,28 @@ dependencies {
     implementation 'com.theokanning.openai-gpt3-java:service:0.18.2'
     implementation 'org.springframework.boot:spring-boot-starter-web:3.2.2'
     implementation 'org.jsoup:jsoup:1.17.2'
+    implementation "com.aayushatharva.brotli4j:brotli4j:$brotliVersion"
+    runtimeOnly("""com.aayushatharva.brotli4j:native-${
+        if (operatingSystem.isWindows())
+            if (currentArchitecture.isX86_64()) "windows-x86_64"
+            else if (currentArchitecture.isArm()) "windows-aarch64"
+            else
+                throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
+        else if (operatingSystem.isMacOsX())
+            if (currentArchitecture.isArm()) "osx-aarch64"
+            else "osx-x86_64"
+        else if (operatingSystem.isLinux())
+            if (currentArchitecture.isAARCH64()) "linux-aarch64"
+            else if (currentArchitecture.isX86_64()) "linux-x86_64"
+            else if (currentArchitecture.isARM_V7()) "linux-armv7"
+            else if (currentArchitecture.isPPC64LE()) "linux-ppc64le"
+            else if (currentArchitecture.isS390X()) "linux-s390x"
+            else if (currentArchitecture.isRISCV64()) "linux-riscv64"
+            else
+                throw new IllegalStateException("Unsupported architecture: ${currentArchitecture.getName()}");
+        else
+            throw new IllegalStateException("Unsupported operating system: $operatingSystem");
+    }:$brotliVersion""")
 
     testImplementation platform('org.junit:junit-bom:5.9.1')
     testImplementation 'org.junit.jupiter:junit-jupiter'
